@@ -33,12 +33,40 @@ def e_step(data_set, centroids, init_cov, pi, k):
             gamma[cluster_data_set_index][i] /= datapoint_normalization[i]
     return gamma
 
+def m_step(data_set, centroids, init_cov, pi, k, gamma):
+    Nk = [sum(gamma_cluster) for gamma_cluster in gamma]
+    centroids_new = []
+    for cluster_data_set_index in range(len(gamma)):
+        cluster_mean_x = 0
+        cluster_mean_y = 0
+        for i in range(len(data_set)):
+            cluster_mean_x += gamma[cluster_data_set_index][i]*data_set[i][0]
+            cluster_mean_y += gamma[cluster_data_set_index][i]*data_set[i][1]
+        cluster_mean_x /= Nk[cluster_data_set_index]
+        cluster_mean_y /= Nk[cluster_data_set_index]
+        centroids_new.append([cluster_mean_x, cluster_mean_y])
+
+    cov_new = []
+    for cluster_data_set_index in range(len(gamma)):
+        cov_xx = 0
+        cov_yy = 0
+        cov_xy = 0
+        for i in range(len(data_set)):
+            cov_xx += (1/Nk[cluster_data_set_index])*gamma[cluster_data_set_index][i]*(data_set[i][0] - centroids_new[cluster_data_set_index][0])**2
+            cov_yy += (1/Nk[cluster_data_set_index])*gamma[cluster_data_set_index][i]*(data_set[i][1] - centroids_new[cluster_data_set_index][1])**2
+            cov_xy += (1/Nk[cluster_data_set_index])*gamma[cluster_data_set_index][i]*(data_set[i][1] - centroids_new[cluster_data_set_index][1])*(data_set[i][0] - centroids_new[cluster_data_set_index][0])
+        cov_new.append([[cov_xx, cov_xy], [cov_xy, cov_yy]])
+
+    pi_new = [Nk_cluster/len(data_set) for Nk_cluster in Nk]
+
+
+
 
 
 def main():
     global k_values
     data_set, initial_centroids, init_cov, init_pi = initialize_GMM(r"../Input_Files/GMM_dataset 546.txt", k_values[0])
-    e_step(data_set, initial_centroids, init_cov, init_pi, k_values[0])
-
+    gamma = e_step(data_set, initial_centroids, init_cov, init_pi, k_values[0])
+    m_step(data_set, initial_centroids, init_cov, init_pi, k_values[0], gamma)
 if __name__ == "__main__":
     main()
