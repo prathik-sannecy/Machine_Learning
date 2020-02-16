@@ -68,16 +68,53 @@ def run_kmeans(data_set, initial_centroids, r=None):
         i += 1
     return clusters, centroids
 
+def get_error_squared(p0, p1):
+    """Returns the squared error between two 2d points"""
+    return (p0[0] - p1[0])**2 + (p0[1] - p1[1])**2
+
+def calc_clusters_error(clusters, centroids):
+    """Returns the total error of a certain clustering of data points"""
+    error = 0
+    for cluster_index in range(len(centroids)):
+        for p in clusters[cluster_index]:
+            error += get_error_squared(p, centroids[cluster_index])
+    return error
+
+def get_best_kmeans(data_set, r, k ):
+    """Runs kMeans with k clusters r number of times. Returns the best clustering from those r runs, and the squared error of the resulting clustering"""
+    runs_centroids = []
+    runs_clusters = []
+    min_run_error = float("inf")
+
+    for run in range(r):
+        initial_averages = initialize_centroids(data_set, k)
+        clusters, centroids = run_kmeans(data_set, initial_averages)
+        run_error = calc_clusters_error(clusters, centroids)
+        # Keep track of the best run
+        if run_error < min_run_error:
+            min_run_error = run_error
+            best_clusturing = clusters
+    return best_clusturing, min_run_error
+
 def main():
     data_set = get_data_set(r"../Input_Files/GMM_dataset 546.txt")
-    initial_averages = initialize_centroids(data_set, 3)
-    clusters, centroids = run_kmeans(data_set, initial_averages  )
+
+    # Run the kmeans algorithms with different values of k
+    min_kmean_error = float("inf")
+    for k in range(1, 10):
+        clusters, error = get_best_kmeans(data_set, 10, k)
+        print(error)
+        # Keep track of which value of k gives the smallest error
+        if error < min_kmean_error:
+            best_kmeans_clustering_model = clusters
+            min_kmean_error = error
+
 
     # Display the kMeans clusters in a scatter plot
     colors = 10 * ["r", "g", "c", "b", "k"]
-    for cluster_index in range(len(clusters)):
+    for cluster_index in range(len(best_kmeans_clustering_model)):
         color = colors[cluster_index]
-        for features in clusters[cluster_index]:
+        for features in best_kmeans_clustering_model[cluster_index]:
             plt.scatter(features[0], features[1], color=color, s=30)
 
     plt.show()
