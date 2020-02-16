@@ -1,15 +1,17 @@
+# This file implements kMeans algorithm on a set of 2d data points.
+# The number of clusters (k), can be set by defining the k_values parameter below.
+# If many k_values are chosen, the one with the highest k is plotted.
+# Written by Prathik Sannecy
+# 2/15/2020
+
+
 import matplotlib.pyplot as plt
 from matplotlib import style
 import numpy as np
 import random
 
 num_runs = 10 # number of runs to try clustering on. Chooses the best clustering based on which run had the least error
-k_values = range(3, 6) # which k values to run kmeans on
-
-class Cluster():
-    def __init__(self):
-        self.average = None
-        self.points = []
+k_values = [3] # which k values to run kmeans on
 
 def get_distance(p0, p1):
     """Returns the distance between two 2d points"""
