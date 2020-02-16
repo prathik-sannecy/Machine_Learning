@@ -10,6 +10,7 @@ from matplotlib import style
 import numpy as np
 import random
 
+file_name = r"../Input_Files/GMM_dataset 546.txt" # file with the data set
 num_runs = 10 # number of runs to try clustering on. Chooses the best clustering based on which run had the least error
 k_values = [3] # which k values to run kmeans on
 
@@ -103,8 +104,8 @@ def get_best_kmeans(data_set, r, k ):
 def main():
     global num_runs
     global k_values
-
-    data_set = get_data_set(r"../Input_Files/GMM_dataset 546.txt")
+    global file_name
+    data_set = get_data_set(file_name)
 
     # Run the kmeans algorithms with different values of k
     min_kmean_error = float("inf")
