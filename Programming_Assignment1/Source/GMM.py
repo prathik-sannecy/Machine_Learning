@@ -11,7 +11,8 @@ import math
 import matplotlib.pyplot as plt
 from matplotlib import style
 
-k_values = [2] # which k values to run kmeans on
+file_name = r"../Input_Files/GMM_dataset 546.txt" # file with the data set
+k_values = [2, 3] # which k values to run kmeans on
 num_runs = 3 # number of runs to try clustering on. Chooses the best clustering based on which run had the least error
 tolerance = .1 # tolerance for when to stop the algorithm (based on log-likelyhood)
 max_iterations = 100 # In case this algorithm doesn't converge, stop after this many iterations
@@ -133,7 +134,6 @@ def run_GMM(data_set, init_centroids, init_cov, init_pi, k, tolerance, r=None):
         log_likelyhood_old = log_likelyhood
         log_likelyhood = calc_log_likelyhood(data_set, centroids, cov, pi)
         count += 1
-        print(log_likelyhood)
     return gamma, log_likelyhood, centroids, cov, pi
 
 
@@ -146,7 +146,6 @@ def get_best_GMM(data_set, num_runs, k, tolerance, r):
     for run in range(num_runs):
         init_centroids, init_cov, init_pi = initialize_GMM(data_set, k)
         gamma, log_likelyhood, centroids, cov, pi = run_GMM(data_set, init_centroids, init_cov, init_pi, k, tolerance, r)
-        print("iteration likelyhood " + str(log_likelyhood))
         # Keep track of the best run
         if log_likelyhood > max_log_likelyhood:
             best_gamma, best_centroids, best_cov, best_pi, max_log_likelyhood = gamma, centroids, cov, pi, log_likelyhood
@@ -159,11 +158,31 @@ def main():
     global max_iterations
     global tolerance
     global num_runs
-    data_set = kMeans.get_data_set(r"../Input_Files/GMM_dataset 546.txt")
-    gamma, centroids, cov, pi, log_likelyhood = get_best_GMM(data_set, num_runs, k_values[0], tolerance, max_iterations)
+    global file_name
+    data_set = kMeans.get_data_set(file_name)
 
-    print("best likelyhood" + str(log_likelyhood))
-    classify(data_set, gamma) # Classify the points based on their gamma functions
+    # Run the GMM algorithms with different values of k
+    max_GMM_likelyhood = float("-inf")
+    for k in k_values:
+        gamma, centroids, cov, pi, log_likelyhood = get_best_GMM(data_set, num_runs, k, tolerance, max_iterations)
+
+        # Keep track of which value of k gives the highest likelyhood
+        if log_likelyhood > max_GMM_likelyhood:
+            best_gamma = gamma
+            max_GMM_likelyhood = log_likelyhood
+
+        print("k = " + str(k))
+        print("\tlog likelyhood = " + str(log_likelyhood))
+        for cluster_index in range(len(centroids)):
+            print("\tcluster " + str(cluster_index))
+            print("\t\tcentroid =  " + str(centroids[cluster_index]))
+            print("\t\tcov =  " + str(cov[cluster_index]))
+            print("\t\tpi =  " + str(pi[cluster_index]))
+        print("\t")
+
+
+
+    classify(data_set, best_gamma) # Classify the points based on their gamma functions
 
 
 
