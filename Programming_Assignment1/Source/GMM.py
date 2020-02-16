@@ -1,3 +1,9 @@
+# This file implements GMM algorithm on a set of 2d data points (GMM_dataset 546.txt in this case).
+# The number of clusters (k), can be set by defining the k_values parameter below.
+# If many k_values are chosen, the one with the highest k is plotted.
+# Written by Prathik Sannecy
+# 2/15/2020
+
 import Programming_Assignment1.Source.kMeans as kMeans
 import numpy as np
 from scipy.stats import norm, multivariate_normal
@@ -7,39 +13,49 @@ from matplotlib import style
 
 num_runs = 100 # number of runs to try clustering on. Chooses the best clustering based on which run had the least error
 k_values = [5] # which k values to run kmeans on
-tolerance = .1
+tolerance = .1 # tolerance for when to stop the algorithm (based on log-likelyhood)
 
-def initialize_GMM(data_set_file, k):
-
+def initialize_GMM(data_set, k):
+    """Run kMeans to initialize the centroids, the covariances (x and y coordinates per data point), the the pi values for the GMM algorithm"""
     global num_runs
-    data_set = kMeans.get_data_set(data_set_file)
-    initial_centroids = kMeans.initialize_centroids(data_set, k)
-    init_clusters, init_centroids = kMeans.run_kmeans(data_set, initial_centroids)
+    init_centroids = kMeans.initialize_centroids(data_set, k)
+    init_clusters, init_centroids = kMeans.run_kmeans(data_set, init_centroids)
     init_cov = [np.cov([point[0] for point in cluster], [point[1] for point in cluster]).tolist() for cluster in init_clusters]
     init_pi = [len(cluster) / len(data_set) for cluster in init_clusters]
     assert(sum(init_pi) == 1)
-    return data_set, initial_centroids, init_cov, init_pi
+    return init_centroids, init_cov, init_pi
 
 def e_step(data_set, centroids, cov, pi, k):
+    """Runs the E Step of the GMM algorithm, and returns gamma
+    gamma = pi_k * N(x_n|centroid_k, cov_k) / (Sum from j = 1 to K(pi_j * N(x_n|centroid_j, cov_j))
+    """
     # gamma is a num of clusters x num of datapoints size 2D matrix
     gamma = [[0]*len(data_set) for _ in range(k)]
+    # Calculate the numerator of gamma
     for cluster_data_set_index in range(k):
         for i in range(len(data_set)):
             var = multivariate_normal(centroids[cluster_data_set_index], cov[cluster_data_set_index])
             var_pdf = var.pdf(data_set[i])
             gamma[cluster_data_set_index][i] = pi[cluster_data_set_index] * var_pdf
+    # Calculate the denominator of gamma
     datapoint_normalization = []
     for i in range(len(data_set)):
         datapoint_normalization.append(sum([cluster[i] for cluster in gamma]))
+    # Normalize gamma by dividing each element by the denominator
     for cluster_data_set_index in range(k):
         for i in range(len(data_set)):
             gamma[cluster_data_set_index][i] /= datapoint_normalization[i]
     return gamma
 
 def m_step(data_set, gamma):
-    Nk = [sum(gamma_cluster) for gamma_cluster in gamma]
-
+    """Runs the M Step of the GMM algorithm, and returns the new centroids, covariances, and pi values
+    centroidNew_k = (1/N_k) * Sum from n = 1 to N(gamma_k_n * x_n)
+    covarianceNew_k = (1/N_k) * Sum from n = 1 to N(gamma_k_n * (x_n - centroidNew_k) * (x_n - centroidNew_k)^T))
+    piNew_k = N_k / N
+    """
+    Nk = [sum(gamma_cluster) for gamma_cluster in gamma] # Normalization factor
     centroids_new = []
+    # Calculate the centroid of each cluster
     for cluster_data_set_index in range(len(gamma)):
         cluster_mean_x = 0
         cluster_mean_y = 0
@@ -49,7 +65,7 @@ def m_step(data_set, gamma):
         cluster_mean_x /= Nk[cluster_data_set_index]
         cluster_mean_y /= Nk[cluster_data_set_index]
         centroids_new.append([cluster_mean_x, cluster_mean_y])
-
+    # Calculate the covariance of each cluster
     cov_new = []
     for cluster_data_set_index in range(len(gamma)):
         cov_xx = 0
@@ -61,12 +77,12 @@ def m_step(data_set, gamma):
             cov_xy += (1/Nk[cluster_data_set_index])*gamma[cluster_data_set_index][i]*(data_set[i][1] - centroids_new[cluster_data_set_index][1])*(data_set[i][0] - centroids_new[cluster_data_set_index][0])
         cov_new.append([[cov_xx, cov_xy], [cov_xy, cov_yy]])
 
-    pi_new = [Nk_cluster/len(data_set) for Nk_cluster in Nk]
-
+    pi_new = [Nk_cluster/len(data_set) for Nk_cluster in Nk] # Calculate the new pi value for each cluster
     return centroids_new, cov_new, pi_new
 
-
-def check_convergence(data_set, centroids, cov, pi):
+def calc_log_likelyhood(data_set, centroids, cov, pi):
+    """Calculates log(p(X|centroids, covariances, pi values)) =
+        Sum from n=1 to N(log(Sum from k=1 to K(pi_k * N(x_n|centroids_k, covariances_k))))"""
     sum_likelyhoods = 0
     for i in range(len(data_set)):
         sum_cluster = 0
@@ -79,7 +95,12 @@ def check_convergence(data_set, centroids, cov, pi):
 
 
 def classify(data_set, gamma):
+    """Based on the gamma function, classifies the points into cluster.
+    Basically, the point gets classified into the cluster that has the largest gamma function for that point
+    Then display the scatter plot of the clusters
+    """
     clusters = [[] for _ in gamma]
+    # For each point, search the gamma function cluster indexes for the maximum value. Add that point to that cluster
     for i in range(len(data_set)):
         clusters_with_i = [cluster[i] for cluster in gamma]
         max_cluster_with_i = clusters_with_i.index(max(clusters_with_i))
@@ -98,24 +119,27 @@ def main():
     global num_runs
     global tolerance
     log_likelyhood_old = float("-inf")
-    data_set, initial_centroids, init_cov, init_pi = initialize_GMM(r"../Input_Files/GMM_dataset 546.txt", k_values[0])
+    data_set = kMeans.get_data_set(r"../Input_Files/GMM_dataset 546.txt")
+    initial_centroids, init_cov, init_pi = initialize_GMM(data_set, k_values[0])
+
+    # Run at least 1 iteration of GMM
     gamma = e_step(data_set, initial_centroids, init_cov, init_pi, k_values[0])
     centroids, cov, pi = m_step(data_set, gamma)
-    log_likelyhood = check_convergence(data_set, centroids, cov, pi)
+    log_likelyhood = calc_log_likelyhood(data_set, centroids, cov, pi)
     count = 1
+
+    # Go until we've reached the max number of iterations, or we've converged (log-likelyhood isn't changing)
     while log_likelyhood > (log_likelyhood_old + tolerance):
         if count >= num_runs:
             break
         gamma = e_step(data_set, centroids, cov, pi, k_values[0])
         centroids, cov, pi = m_step(data_set, gamma)
         log_likelyhood_old = log_likelyhood
-        log_likelyhood = check_convergence(data_set, centroids, cov, pi)
+        log_likelyhood = calc_log_likelyhood(data_set, centroids, cov, pi)
         count += 1
-
         print(log_likelyhood)
-    classify(data_set, gamma)
 
-
+    classify(data_set, gamma) # Classify the points based on their gamma functions
 
 if __name__ == "__main__":
     main()

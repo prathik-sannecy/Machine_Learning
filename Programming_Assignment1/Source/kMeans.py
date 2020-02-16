@@ -1,4 +1,4 @@
-# This file implements kMeans algorithm on a set of 2d data points.
+# This file implements kMeans algorithm on a set of 2d data points (GMM_dataset 546.txt in this case).
 # The number of clusters (k), can be set by defining the k_values parameter below.
 # If many k_values are chosen, the one with the highest k is plotted.
 # Written by Prathik Sannecy
