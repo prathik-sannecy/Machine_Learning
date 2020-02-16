@@ -5,9 +5,9 @@ import math
 import matplotlib.pyplot as plt
 from matplotlib import style
 
-num_runs = 50 # number of runs to try clustering on. Chooses the best clustering based on which run had the least error
-k_values = [3] # which k values to run kmeans on
-
+num_runs = 100 # number of runs to try clustering on. Chooses the best clustering based on which run had the least error
+k_values = [5] # which k values to run kmeans on
+tolerance = .1
 
 def initialize_GMM(data_set_file, k):
 
@@ -96,13 +96,14 @@ def classify(data_set, gamma):
 def main():
     global k_values
     global num_runs
+    global tolerance
     log_likelyhood_old = float("-inf")
     data_set, initial_centroids, init_cov, init_pi = initialize_GMM(r"../Input_Files/GMM_dataset 546.txt", k_values[0])
     gamma = e_step(data_set, initial_centroids, init_cov, init_pi, k_values[0])
     centroids, cov, pi = m_step(data_set, gamma)
     log_likelyhood = check_convergence(data_set, centroids, cov, pi)
     count = 1
-    while log_likelyhood != log_likelyhood_old:
+    while log_likelyhood > (log_likelyhood_old + tolerance):
         if count >= num_runs:
             break
         gamma = e_step(data_set, centroids, cov, pi, k_values[0])
@@ -111,7 +112,7 @@ def main():
         log_likelyhood = check_convergence(data_set, centroids, cov, pi)
         count += 1
 
-        print(centroids)
+        print(log_likelyhood)
     classify(data_set, gamma)
 
 
