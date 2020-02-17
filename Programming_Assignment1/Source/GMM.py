@@ -4,7 +4,7 @@
 # Written by Prathik Sannecy
 # 2/15/2020
 
-import Programming_Assignment1.Source.kMeans as kMeans
+import kMeans
 import numpy as np
 from scipy.stats import norm, multivariate_normal
 import math
@@ -12,8 +12,8 @@ import matplotlib.pyplot as plt
 from matplotlib import style
 
 file_name = r"../Input_Files/GMM_dataset 546.txt" # file with the data set
-k_values = [2, 3] # which k values to run kmeans on
-num_runs = 3 # number of runs to try clustering on. Chooses the best clustering based on which run had the least error
+k_values = [3] # which k values to run kmeans on
+num_runs = 5 # number of runs to try clustering on. Chooses the best clustering based on which run had the least error
 tolerance = .1 # tolerance for when to stop the algorithm (based on log-likelyhood)
 max_iterations = 100 # In case this algorithm doesn't converge, stop after this many iterations
 
@@ -23,7 +23,6 @@ def initialize_GMM(data_set, k):
     init_clusters, init_centroids = kMeans.run_kmeans(data_set, init_centroids)
     init_cov = [np.cov([point[0] for point in cluster], [point[1] for point in cluster]).tolist() for cluster in init_clusters]
     init_pi = [len(cluster) / len(data_set) for cluster in init_clusters]
-    assert(sum(init_pi) == 1)
     return init_centroids, init_cov, init_pi
 
 def e_step(data_set, centroids, cov, pi, k):
