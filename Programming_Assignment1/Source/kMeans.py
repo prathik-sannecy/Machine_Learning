@@ -12,14 +12,16 @@ import random
 
 file_name = r"../Input_Files/GMM_dataset 546.txt" # file with the data set
 num_runs = 10 # number of runs to try clustering on. Chooses the best clustering based on which run had the least error
-k_values = [3] # which k values to run kmeans on
+k_values = [6] # which k values to run kmeans on
 
 def get_distance(p0, p1):
     """Returns the distance between two 2d points"""
     return np.sqrt((p0[0] - p1[0])**2 + (p0[1] - p1[1])**2)
 
-def calc_average_cluster(points):
+def calc_average_cluster(points, default):
     """Returns the average point of a group of 2d cluster points"""
+    if points == []:
+        return default
     return [sum([p[0] for p in points])/len(points),sum([p[1] for p in points])/len(points)]
 
 
@@ -42,7 +44,7 @@ def create_new_clusters(data_set, cluster_averages):
 
 def get_new_averages(clusters):
     """Returns the centroids/averages of each cluster of data points"""
-    return [calc_average_cluster(cluster) for cluster in clusters]
+    return [calc_average_cluster(cluster, [nonempty_cluster for nonempty_cluster in clusters if nonempty_cluster != []][0][0]) for cluster in clusters]
 
 def get_data_set(data_set_file):
     """Parses a text file of 2d data points, returns a list of list of data points"""
