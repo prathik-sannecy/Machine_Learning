@@ -47,6 +47,7 @@ class TicTacToeGame():
             return False
 
         def check_column_win(player):
+            # For doing a column check, transpose the grid and do a row check
             trans_game_state = numpy.transpose(self.game_state)
             for row in trans_game_state:
                 if player == row[0] == row[1] == row[2]:
@@ -98,6 +99,22 @@ class TicTacToeGame():
         self.game_state[move[0]][move[1]] = player
 
     def get_game_state(self):
+        """Returns:
+            list[list[(char)]] game_state: the grid representing the state of the game"""
         return self.game_state
+
+    def check_tie(self, player1, player2):
+        """Checks whether the game has tied or not
+
+        inputs:
+            (char) player1: Player1
+            (char) player2: Player2
+
+        returns:
+            True if the grid is full and neither player won, False otherwise
+        """
+        if self.check_win(player1) or self.check_win(player2):
+            return False
+        return self.check_grid_full()
     
     

@@ -81,6 +81,27 @@ class test_TicTacToe(unittest.TestCase):
         assert(tic_tack_toe.check_win('X') == False)
         assert(tic_tack_toe.check_win('O') == True)
 
+    def test_check_tie(self):
+        tic_tack_toe = TicTacToeGame()
+        tic_tack_toe.game_state = [
+            ['X', 'O', None],
+            ['O', 'O', "X"],
+            [None, 'O', None]
+        ]
+        assert(tic_tack_toe.check_tie('X', 'O') == False)
+        tic_tack_toe.game_state = [
+            ['X', 'X', 'O'],
+            ['O', 'O', 'X'],
+            ['X', 'O', 'X']
+        ]
+        assert(tic_tack_toe.check_tie('X', 'O') == True)
+        tic_tack_toe.game_state = [
+            ['X', 'O', 'O'],
+            ['O', 'O', 'X'],
+            ['O', 'O', 'O']
+        ]
+        assert(tic_tack_toe.check_tie('X', 'O') == False)
+
 
 
 if __name__ == '__main__':
