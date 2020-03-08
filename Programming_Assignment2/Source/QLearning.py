@@ -53,3 +53,19 @@ class QTable_TicTacToe():
             if value > max_value:
                 max_action, max_value = action, value
         return [max_action, max_value]
+
+    def update_state_action_reward(self, tic_tac_toe_game:TicTacToe.TicTacToeGame , action, reward):
+        """Updates the QTable's state and action with a new reward
+
+        inputs:
+            TicTacToeGame tic_tac_toe_game: the current state of the tic tac toe game
+            List[int, int] action: the next position to make a move
+            int reward: the new updated reward for the QTable
+
+        returns:
+            None
+        """
+        for e in self.QTable:
+            [state, state_action, value] = e
+            if state == tic_tac_toe_game.game_state and state_action == action:
+                e[2] = reward

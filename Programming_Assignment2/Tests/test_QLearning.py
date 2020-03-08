@@ -47,9 +47,7 @@ class test_QLearning(unittest.TestCase):
             [None, 'X', None]
         ]
         QTable = QTable_TicTacToe()
-        for e in QTable.QTable:
-            if e[0] == tic_tack_toe.game_state and e[1] == [2, 2]:
-                e[2] = 4
+        QTable.update_state_action_reward(tic_tack_toe,[2, 2], 4)
         assert(QTable.max_action_reward(tic_tack_toe) == [[2, 2], 4])
 
 
