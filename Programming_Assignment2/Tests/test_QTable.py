@@ -47,8 +47,9 @@ class test_QTable(unittest.TestCase):
             [None, 'X', None]
         ]
         QTable = QTable_TicTacToe()
-        QTable.update_state_action_reward(tic_tack_toe,[2, 2], 4)
-        assert(QTable.max_action_reward(tic_tack_toe) == [[2, 2], 4])
+        QTable.update_state_action_value(tic_tack_toe.game_state,[2, 2], 4)
+        print(QTable.max_action_value(tic_tack_toe))
+        assert(QTable.max_action_value(tic_tack_toe) == [[2, 2], 4])
 
 
 

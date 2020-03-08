@@ -35,17 +35,17 @@ class QTable_TicTacToe():
         """
         return [[action, value] for [state, action, value] in self.QTable if state == tic_tac_toe_game.get_game_state() and tic_tac_toe_game.test_valid_move(action)]
 
-    def max_action_reward(self, tic_tac_toe_game:TicTacToe.TicTacToeGame ):
-        """Returns the action and the value that has the largest reward based on being in a particular state
+    def max_action_value(self, tic_tac_toe_game:TicTacToe.TicTacToeGame):
+        """Returns the action and the value that has the largest value based on being in a particular state
 
         inputs:
             TicTacToeGame tic_tac_toe_game: the current state of the tic tac toe game
 
         returns:
-            List[List[int, int], int] max_action_reward: the action and reward with that's the largest based on the current state
+            List[List[int, int], int] max_action_value: the action and value with that's the largest based on the current state
         """
         # Traverse through all the possible actions in a particular state
-        # Pick the action that yields the highest reward
+        # Pick the action that yields the highest value
         actions_values = self.get_actions_rewards(tic_tac_toe_game)
         [max_action, max_value] = actions_values[0]
         for action_value in actions_values:
@@ -54,18 +54,18 @@ class QTable_TicTacToe():
                 max_action, max_value = action, value
         return [max_action, max_value]
 
-    def update_state_action_reward(self, tic_tac_toe_game:TicTacToe.TicTacToeGame , action, reward):
-        """Updates the QTable's state and action with a new reward
+    def update_state_action_value(self, tic_tac_toe_game_state, action, new_value):
+        """Updates the QTable's state and action with a new value
 
         inputs:
-            TicTacToeGame tic_tac_toe_game: the current state of the tic tac toe game
+            List[List[char]] tic_tac_toe_game_state: the  grid of the tic tac toe game
             List[int, int] action: the next position to make a move
-            int reward: the new updated reward for the QTable
+            int new_value: the new updated value for the QTable
 
         returns:
             None
         """
         for e in self.QTable:
             [state, state_action, value] = e
-            if state == tic_tac_toe_game.game_state and state_action == action:
-                e[2] = reward
+            if state == tic_tac_toe_game_state and state_action == action:
+                e[2] = new_value
