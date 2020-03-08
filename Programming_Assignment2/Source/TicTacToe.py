@@ -35,15 +35,40 @@ class TicTacToeGame():
         """Checks whether a player has won or not
     
         inputs:
-            (char) player: which player to check has wone
+            (char) player: which player to check has won
     
         returns:
             True if the player has won, False otherwise
         """
-        pass
+        def check_row_win(player):
+            for row in self.game_state:
+                if player == row[0] == row[1] == row[2]:
+                    return True
+            return False
+
+        def check_column_win(player):
+            trans_game_state = numpy.transpose(self.game_state)
+            for row in trans_game_state:
+                if player == row[0] == row[1] == row[2]:
+                    return True
+            return False
+
+        def check_diag_win(player):
+            # Left to right diagonal
+            if player == self.game_state[0][0] == self.game_state[1][1] == self.game_state[2][2]:
+                return True
+            # Right to left diagonal
+            if player == self.game_state[0][2] == self.game_state[1][1] == self.game_state[2][0]:
+                return True
+            return False
+
+        if check_column_win(player) or check_diag_win(player) or check_row_win(player):
+            return True
+        return False
+
     
     
-    def check_full(self):
+    def check_grid_full(self):
         """Checks whether the grid is full
     
         inputs:

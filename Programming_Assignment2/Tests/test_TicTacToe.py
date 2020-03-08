@@ -30,13 +30,13 @@ class test_TicTacToe(unittest.TestCase):
             ['O', 'O', "X"],
             [None, 'X', None]
         ]
-        assert(tic_tack_toe.check_full() == False)
+        assert(tic_tack_toe.check_grid_full() == False)
         tic_tack_toe.game_state = [
             ['X', 'O', 'X'],
             ['O', 'O', "X"],
             ['O', 'X', 'O']
         ]
-        assert(tic_tack_toe.check_full() == True)
+        assert(tic_tack_toe.check_grid_full() == True)
 
     def test_make_move(self):
         tic_tack_toe = TicTacToeGame()
@@ -54,6 +54,32 @@ class test_TicTacToe(unittest.TestCase):
         tic_tack_toe.make_move([2, 0], 'X')
         assert(tic_tack_toe.get_game_state() == grid_new)
 
+    def test_check_win(self):
+        tic_tack_toe = TicTacToeGame()
+        tic_tack_toe.game_state = [
+            ['X', 'O', None],
+            ['O', 'O', "X"],
+            [None, 'O', None]
+        ]
+        # Check no win
+        assert(tic_tack_toe.check_win('X') == False)
+        assert(tic_tack_toe.check_win('O') == True)
+        tic_tack_toe.game_state = [
+            ['O', 'O', 'X'],
+            ['O', 'X', "X"],
+            ['X', 'O', 'O']
+        ]
+        # Check diag win
+        assert(tic_tack_toe.check_win('X') == True)
+        assert(tic_tack_toe.check_win('O') == False)
+        tic_tack_toe.game_state = [
+            ['O', 'O', 'X'],
+            ['O', None, "X"],
+            ['O', 'X', 'O']
+        ]
+        # check column win
+        assert(tic_tack_toe.check_win('X') == False)
+        assert(tic_tack_toe.check_win('O') == True)
 
 
 
