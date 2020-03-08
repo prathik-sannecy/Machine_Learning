@@ -1,8 +1,8 @@
 import unittest
-from Programming_Assignment2.Source.QLearning import *
+from Programming_Assignment2.Source.QTable import *
 from Programming_Assignment2.Source.TicTacToe import *
 
-class test_QLearning(unittest.TestCase):
+class test_QTable(unittest.TestCase):
 
     def test_init_QTable(self):
         QTable = QTable_TicTacToe()
