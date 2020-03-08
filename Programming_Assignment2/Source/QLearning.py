@@ -20,7 +20,7 @@ def init_QTable_TicTacToe():
         for row2 in row_combinations:
             for row3 in row_combinations:
                 for location in grid_locations:
-                    QTable.append([[[row1, row2, row3], location], 0])
+                    QTable.append([[row1, row2, row3], location, 0])
     return QTable
 
 

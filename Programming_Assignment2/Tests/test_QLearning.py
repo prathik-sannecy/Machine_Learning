@@ -14,7 +14,7 @@ class test_QLearning(unittest.TestCase):
         location = [0, 2]
 
         # Make sure the grid is intialized in the QTable, and only one instance is there
-        mapped_grid = [match[1] for match in QTable_init if match[0] == [grid, location]]
+        mapped_grid = [match[2] for match in QTable_init if match[0] == grid and match[1] == location]
         assert(mapped_grid == [0])
 
         grid = [
@@ -24,7 +24,7 @@ class test_QLearning(unittest.TestCase):
         ]
         location = [0, 0]
         # Make sure the grid is intialized in the QTable, and only one instance is there
-        mapped_grid = [match[1] for match in QTable_init if match[0] == [grid, location]]
+        mapped_grid = [match[2] for match in QTable_init if match[0] == grid and match[1] == location]
         assert(mapped_grid == [0])
 
         assert(len(QTable_init) == 177147) # 27*27*27 different grids x 9 different grid locations
