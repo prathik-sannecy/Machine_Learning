@@ -3,9 +3,6 @@ import Programming_Assignment2.Source.QTable as QTable
 import random
 import copy
 
-init_greedy = 0.1 # Initial value for how often a greedy selection should be made
-epoch = 10 # Decrease the greedy percentage after this many epochs
-decrease_greedy_per_epoch = .001 # Decrease the greedy percentage by this much
 discount_factor = .8
 learning_rate = .05
 WIN_REWARD = 1
