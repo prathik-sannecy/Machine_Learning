@@ -1,5 +1,6 @@
 import Programming_Assignment2.Source.TicTacToe as TicTacToe
 import itertools
+import random
 
 class QTable_TicTacToe():
     def __init__(self):
@@ -48,11 +49,15 @@ class QTable_TicTacToe():
         # Pick the action that yields the highest value
         actions_values = self.get_actions_rewards(tic_tac_toe_game)
         [max_action, max_value] = actions_values[0]
+        max_action_list = [[max_action, max_value]]
         for action_value in actions_values:
             [action, value] = action_value
             if value > max_value:
+                max_action_list = [[action, value]]
                 max_action, max_value = action, value
-        return [max_action, max_value]
+            if value == max_value:
+                max_action_list.append([action, value])
+        return max_action_list[random.randrange(len(max_action_list))]
 
     def update_state_action_value(self, tic_tac_toe_game_state, action, new_value):
         """Updates the QTable's state and action with a new value
