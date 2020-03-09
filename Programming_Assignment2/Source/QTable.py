@@ -52,11 +52,11 @@ class QTable_TicTacToe():
         max_action_list = [[max_action, max_value]]
         for action_value in actions_values:
             [action, value] = action_value
-            if value > max_value:
-                max_action_list = [[action, value]]
-                max_action, max_value = action, value
             if value == max_value:
                 max_action_list.append([action, value])
+            elif value > max_value:
+                max_action_list = [[action, value]]
+                max_action, max_value = action, value
         return max_action_list[random.randrange(len(max_action_list))]
 
     def update_state_action_value(self, tic_tac_toe_game_state, action, new_value):
