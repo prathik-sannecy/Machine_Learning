@@ -1,8 +1,9 @@
 import Programming_Assignment2.Source.QLearning as QLearning
 import Programming_Assignment2.Source.QTable as QTable
 import Programming_Assignment2.Source.TicTacToe as TicTacToe
+import random
 
-NUM_EPOCHS = 2
+NUM_EPOCHS = 500
 EPOCH = 10 # Decrease the greedy percentage after this many epochs
 DECREASE_GREEDY_PER_EPOCH = .001 # Decrease the greedy percentage by this much
 INIT_GREEDY = 0.1 # Initial value for how often a greedy selection should be made
@@ -24,25 +25,27 @@ def run_tic_tac_toe_game(QLearner_player, random_player):
     tic_tac_toe_game = TicTacToe.TicTacToeGame()
     # Keep running until the game ends
     while True:
-        # QLearner makes a move. Update its QTable, and check if the game has ended
-        old_state, old_Qvalue, action = QLearner_player.make_move(tic_tac_toe_game, 'X', INIT_GREEDY)
-        QLearner_player.update_QTable_after_move(old_state, old_Qvalue, action, tic_tac_toe_game, 'X', 'O')
-        if tic_tac_toe_game.check_win('X'):
-            return QLearning.WIN_REWARD
-        if tic_tac_toe_game.check_tie('X', 'O'):
-            return QLearning.TIE_REWARD
-        # Random player makes a move. Update the QLearner's QTable, and check if the game has ended
-        old_state, old_Qvalue, action = random_player.make_move(tic_tac_toe_game, 'O', RANDOM)
-        QLearner_player.update_QTable_after_move(old_state, old_Qvalue, action, tic_tac_toe_game, 'X', 'O')
+         # Random player makes a move. Update the QLearner's QTable, and check if the game has ended
+        old_state, old_Qvalue, action = random_player.make_move(tic_tac_toe_game, 'X', RANDOM)
+        QLearner_player.update_QTable_after_move(old_state, old_Qvalue, action, tic_tac_toe_game, 'O', 'X')
         if tic_tac_toe_game.check_win('O'):
             return QLearning.LOSE_REWARD
-        if tic_tac_toe_game.check_tie('X', 'O'):
+        if tic_tac_toe_game.check_tie('O', 'X'):
             return QLearning.TIE_REWARD
 
+
+       # QLearner makes a move. Update its QTable, and check if the game has ended
+        old_state, old_Qvalue, action = QLearner_player.make_move(tic_tac_toe_game, 'O', INIT_GREEDY)
+        QLearner_player.update_QTable_after_move(old_state, old_Qvalue, action, tic_tac_toe_game, 'O', 'X')
+        if tic_tac_toe_game.check_win('O'):
+            return QLearning.WIN_REWARD
+        if tic_tac_toe_game.check_tie('O', 'X'):
+            return QLearning.TIE_REWARD
 
 def main():
     global NUM_EPOCHS
     global EPOCH
+    random.seed()
     # Create the two players
     player1 = QLearning.QLearning()
     player2 = QLearning.QLearning()
