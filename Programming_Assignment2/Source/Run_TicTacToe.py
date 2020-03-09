@@ -5,7 +5,8 @@ import random
 
 NUM_EPOCHS = 500
 EPOCH = 10 # Decrease the greedy percentage after this many epochs
-DECREASE_GREEDY_PER_EPOCH = .01 # Decrease the greedy percentage by this much
+NUM_EPOCHS_DECREASE_GREEDY = 5 # Decrease the Greediness factor after this many epochs
+DECREASE_GREEDY = .01 # Decrease the greedy percentage by this much
 INIT_GREEDY = 0.1 # Initial value for how often a greedy selection should be made
 RANDOM = 1 # Random player should always make random decision 100% of the time
 
@@ -46,19 +47,21 @@ def main():
     global NUM_EPOCHS
     global EPOCH
     global INIT_GREEDY
-    global DECREASE_GREEDY_PER_EPOCH
+    global DECREASE_GREEDY
+    global NUM_EPOCHS_DECREASE_GREEDY
     random.seed()
     random_probability = INIT_GREEDY
     # Create the two players
     player1 = QLearning.QLearning()
     player2 = QLearning.QLearning()
     # Keep track of how many games the 'smart' QLearning algorithm won against the random algorithm
-    for j in range(NUM_EPOCHS):
+    for epoch_number in range(NUM_EPOCHS):
         win_count = 0
         for i in range(EPOCH):
             win_count += run_tic_tac_toe_game(player1, player2, random_probability)
         print(str(win_count/EPOCH))
-        random_probability = max(0, random_probability - DECREASE_GREEDY_PER_EPOCH)
+        if ((epoch_number+1) % NUM_EPOCHS_DECREASE_GREEDY) == 0:
+            random_probability = max(0, random_probability - DECREASE_GREEDY)
 
 
 
