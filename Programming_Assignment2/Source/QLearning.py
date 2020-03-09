@@ -4,7 +4,7 @@ import random
 import copy
 
 discount_factor = .8
-learning_rate = .05
+learning_rate = .1
 WIN_REWARD = 1
 TIE_REWARD = .5
 LOSE_REWARD = 0
