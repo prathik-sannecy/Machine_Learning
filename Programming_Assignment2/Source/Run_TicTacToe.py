@@ -8,6 +8,7 @@ import Programming_Assignment2.Source.QLearning as QLearning
 import Programming_Assignment2.Source.QTable as QTable
 import Programming_Assignment2.Source.TicTacToe as TicTacToe
 import random
+import sys
 
 NUM_EPOCHS = 500 # How many epochs to use to train the QLearner
 EPOCH = 10 # Decrease the greedy percentage after this many epochs
@@ -15,7 +16,7 @@ NUM_EPOCHS_DECREASE_GREEDY = 5 # Decrease the Greediness factor after this many 
 DECREASE_GREEDY = .01 # Decrease the greedy percentage by this much
 INIT_GREEDY = 0.1 # Initial value for how often a greedy selection should be made
 RANDOM = 1 # Random player should always make random decision 100% of the time
-
+QTable_file = 'Tic_Tac_Toe_QLearner.txt'
 
 def run_tic_tac_toe_game(QLearner_player, random_player, random_probability):
     """Runs a game of Tic Tac Toe between a QLearner and a random player
@@ -75,13 +76,76 @@ def train_QLearner():
         print("epoch " + str(epoch_number) + ": " + str(win_count/EPOCH))
         if ((epoch_number+1) % NUM_EPOCHS_DECREASE_GREEDY) == 0:
             random_probability = max(0, random_probability - DECREASE_GREEDY)
+    print("New Q Table trained!")
 
-    with open("Tic_Tac_Toe_QLearner.txt", "w+") as QLearner_file:
+    with open(QTable_file, "w+") as QLearner_file:
         for e in QLearner_player.QTable.QTable:
-            QLearner_file.write(str(e))
+            QLearner_file.write(str(e) + '\n')
+
+def play_QLearner():
+    """Allows the user to play against the QLearning algorithm agent
+
+    inputs:
+        None
+
+    returns:
+        None
+    """
+    def read_QTable():
+        """Read in a trained QTable
+
+        inputs:
+            None
+
+        returns:
+            The previously stored QTable
+        """
+        pass
+    player = QLearning.QLearning()
+    player.QTable = read_QTable()
+    tic_tac_toe_game = TicTacToe.TicTacToeGame()
+    # Keep running until the game ends
+    while True:
+        # User makes a move. Check if the game has ended
+        tic_tac_toe_game.display_grid()
+        user_input = input("Enter where to place 'X' in the form of: row(0-2), column(0-2)\n")
+        action = [user_input.split()[0], user_input.split()[1]]
+        tic_tac_toe_game.make_move(action, 'X')
+        if tic_tac_toe_game.check_win('X'):
+            print("X Wins!")
+            return
+        if tic_tac_toe_game.check_tie('O', 'X'):
+            print("Tie game")
+            return
+
+        print("\n")
+
+        # QLearner makes a move. Check if the game has ended
+        tic_tac_toe_game.display_grid()
+        old_state, old_Qvalue, action = QLearner_player.make_move(tic_tac_toe_game, 'O', random_probability)
+        QLearner_player.update_QTable_after_move(old_state, old_Qvalue, action, tic_tac_toe_game, 'O', 'X')
+        if tic_tac_toe_game.check_win('O') :
+            print("O Wins!")
+            return
+        if tic_tac_toe_game.check_tie('O', 'X'):
+            print("Tie game")
+            return
+
 
 def main():
-    train_QLearner()
+    def user_help_function():
+        print("Play Tic Tac Toe against a QLearning algorithm")
+        print("Use case: python3 -m Programming_Assignment2.Source.Run_TicTacToe [train]")
+        print("Use the 'train' option to reset the Q Table")
+        print("Otherwise, will allow user to play Tic Tac Toe")
+
+    if len(sys.argv) > 1:
+        if sys.argv[1] == "train":
+            train_QLearner()
+        else:
+            user_help_function()
+    else:
+        play_QLearner()
 
 
 if __name__ == '__main__':
