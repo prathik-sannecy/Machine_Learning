@@ -64,18 +64,21 @@ def train_QLearner():
     global NUM_EPOCHS_DECREASE_GREEDY
     random.seed()
     random_probability = INIT_GREEDY
-    # Create the two players
-    player1 = QLearning.QLearning()
-    player2 = QLearning.QLearning()
+    # Create the two players, one QLearner and one random
+    QLearner_player = QLearning.QLearning()
+    random_player = QLearning.QLearning()
     # Keep track of how many games the 'smart' QLearning algorithm won against the random algorithm
     for epoch_number in range(NUM_EPOCHS):
         win_count = 0
         for i in range(EPOCH):
-            win_count += run_tic_tac_toe_game(player1, player2, random_probability)
+            win_count += run_tic_tac_toe_game(QLearner_player, random_player, random_probability)
         print("epoch " + str(epoch_number) + ": " + str(win_count/EPOCH))
         if ((epoch_number+1) % NUM_EPOCHS_DECREASE_GREEDY) == 0:
             random_probability = max(0, random_probability - DECREASE_GREEDY)
 
+    with open("Tic_Tac_Toe_QLearner.txt", "w+") as QLearner_file:
+        for e in QLearner_player.QTable.QTable:
+            QLearner_file.write(str(e))
 
 def main():
     train_QLearner()
