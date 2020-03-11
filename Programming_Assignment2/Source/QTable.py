@@ -1,3 +1,9 @@
+# This module manages the QTable for the QLearner
+# The QTable consists of different Tic Tac Toe states, an action, and the value for that state/action combination
+# It is stored in this format: [grid, action, value]
+# Written by Prathik Sannecy
+# 3/10/2020
+
 import Programming_Assignment2.Source.TicTacToe as TicTacToe
 import itertools
 import random
@@ -47,6 +53,7 @@ class QTable_TicTacToe():
         """
         # Traverse through all the possible actions in a particular state
         # Pick the action that yields the highest value
+        # If there's a tie, pick an action at random
         actions_values = self.get_actions_rewards(tic_tac_toe_game)
         [max_action, max_value] = actions_values[0]
         max_action_list = [[max_action, max_value]]

@@ -1,7 +1,10 @@
+# This module implements the Tic Tac Toe game
+# Written by Prathik Sannecy
+# 3/10/2020
+
 import numpy
 
 class TicTacToeGame():
-
     def __init__(self):
         self.game_state = [[None]*3 for _ in range(3)]
 

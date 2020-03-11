@@ -1,3 +1,9 @@
+# This module implements the QLearning algorithm for Tic Tac Toe
+# Based on the QTable, the random factor, and the QLearning algorithm, it provides what the next Tic Tac Toe
+# move should be, and updates the table accordingly
+# Written by Prathik Sannecy
+# 3/10/2020
+
 import Programming_Assignment2.Source.TicTacToe as TicTacToe
 import Programming_Assignment2.Source.QTable as QTable
 import random
