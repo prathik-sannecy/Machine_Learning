@@ -131,25 +131,25 @@ def play_QLearner():
                     print("That spot is taken!")
             except:
                 print("Please make a valid move!")
+        tic_tac_toe_game.display_grid()
         if tic_tac_toe_game.check_win('X'):
             print("X Wins!")
             return
         if tic_tac_toe_game.check_tie('O', 'X'):
             print("Tie game")
             return
-        tic_tac_toe_game.display_grid()
 
         print("Computer move: ")
 
         # QLearner makes a move. Check if the game has ended
         player.make_move(tic_tac_toe_game, 'O', 0)
+        tic_tac_toe_game.display_grid()
         if tic_tac_toe_game.check_win('O') :
             print("O Wins!")
             return
         if tic_tac_toe_game.check_tie('O', 'X'):
             print("Tie game")
             return
-        tic_tac_toe_game.display_grid()
 
 
 def main():
