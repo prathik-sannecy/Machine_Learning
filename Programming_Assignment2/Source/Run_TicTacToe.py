@@ -10,14 +10,35 @@ import Programming_Assignment2.Source.TicTacToe as TicTacToe
 import random
 import sys
 import json
+import matplotlib.pyplot as plt
+from matplotlib import style
+import numpy as np
 
 NUM_EPOCHS = 500 # How many epochs to use to train the QLearner
 EPOCH = 10 # Decrease the greedy percentage after this many epochs
-NUM_EPOCHS_DECREASE_GREEDY = 5 # Decrease the Greediness factor after this many epochs
+NUM_EPOCHS_DECREASE_GREEDY = 50 # Decrease the Greediness factor after this many epochs
 DECREASE_GREEDY = .01 # Decrease the greedy percentage by this much
 INIT_GREEDY = 0.1 # Initial value for how often a greedy selection should be made
 RANDOM = 1 # Random player should always make random decision 100% of the time
 QTable_file = 'Tic_Tac_Toe_QLearner.txt'
+
+def plot_epoch(data_points):
+    """Plots the datapoints on a scatter plot
+
+    inputs:
+        List[float] data_points: The data points
+
+    returns:
+        None
+    """
+    coef = np.polyfit(range(1, len(data_points) + 1), data_points, 1)
+    poly1d = np.poly1d(coef)
+
+    plt.plot(range(1, len(data_points) + 1), data_points, 'yo', range(1, len(data_points) + 1),
+             poly1d(range(1, len(data_points) + 1)), '--k')
+    plt.xlim(0, len(data_points) + 1)
+    plt.ylim(0, 1)
+    plt.show()
 
 def run_tic_tac_toe_game(QLearner_player, random_player, random_probability):
     """Runs a game of Tic Tac Toe between a QLearner and a random player
@@ -65,6 +86,7 @@ def train_QLearner():
     global DECREASE_GREEDY
     global NUM_EPOCHS_DECREASE_GREEDY
     global QTable_file
+    epochs = []
     random.seed()
     random_probability = INIT_GREEDY
     # Create the two players, one QLearner and one random
@@ -76,6 +98,7 @@ def train_QLearner():
         for i in range(EPOCH):
             win_count += run_tic_tac_toe_game(QLearner_player, random_player, random_probability)
         print("epoch " + str(epoch_number) + ": " + str(win_count/EPOCH))
+        epochs.append(win_count/EPOCH)
         if ((epoch_number+1) % NUM_EPOCHS_DECREASE_GREEDY) == 0:
             random_probability = max(0, random_probability - DECREASE_GREEDY)
     print("New Q Table trained!")
@@ -85,6 +108,8 @@ def train_QLearner():
         json.dump(QLearner_player.QTable.QTable, QLearner_file)
         # for e in QLearner_player.QTable.QTable:
         #     QLearner_file.write(str(e) + '\n')
+
+    plot_epoch(epochs)
 
 def play_QLearner():
     """Allows the user to play against the QLearning algorithm agent
@@ -131,25 +156,25 @@ def play_QLearner():
                     print("That spot is taken!")
             except:
                 print("Please make a valid move!")
+        tic_tac_toe_game.display_grid()
         if tic_tac_toe_game.check_win('X'):
             print("X Wins!")
             return
         if tic_tac_toe_game.check_tie('O', 'X'):
             print("Tie game")
             return
-        tic_tac_toe_game.display_grid()
 
         print("Computer move: ")
 
         # QLearner makes a move. Check if the game has ended
         player.make_move(tic_tac_toe_game, 'O', 0)
+        tic_tac_toe_game.display_grid()
         if tic_tac_toe_game.check_win('O') :
             print("O Wins!")
             return
         if tic_tac_toe_game.check_tie('O', 'X'):
             print("Tie game")
             return
-        tic_tac_toe_game.display_grid()
 
 
 def main():
