@@ -13,6 +13,7 @@ import json
 import matplotlib.pyplot as plt
 from matplotlib import style
 import numpy as np
+import os
 
 NUM_EPOCHS = 500 # How many epochs to use to train the QLearner
 EPOCH = 10 # Decrease the greedy percentage after this many epochs
@@ -36,6 +37,8 @@ def plot_epoch(data_points):
 
     plt.plot(range(1, len(data_points) + 1), data_points, 'yo', range(1, len(data_points) + 1),
              poly1d(range(1, len(data_points) + 1)), '--k')
+    plt.xlabel("epoch number")
+    plt.ylabel("average score")  
     plt.xlim(0, len(data_points) + 1)
     plt.ylim(0, 1)
     plt.show()
@@ -104,7 +107,7 @@ def train_QLearner():
     print("New Q Table trained!")
 
 
-    with open(QTable_file, "w+") as QLearner_file:
+    with open(os.path.join(os.path.dirname(__file__), QTable_file), "w+") as QLearner_file:
         json.dump(QLearner_player.QTable.QTable, QLearner_file)
         # for e in QLearner_player.QTable.QTable:
         #     QLearner_file.write(str(e) + '\n')
@@ -131,7 +134,7 @@ def play_QLearner():
         """
         global QTable_file
         input_QTable = []
-        with open(QTable_file) as input_QTable_file:
+        with open(os.path.join(os.path.dirname(__file__), QTable_file)) as input_QTable_file:
             input_QTable = json.load(input_QTable_file)
             # for e in QTable_file:
             #
