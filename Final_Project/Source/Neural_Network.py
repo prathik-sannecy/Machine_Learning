@@ -1,3 +1,5 @@
+# Code leveraged from Keras tutorial: https://www.tensorflow.org/tutorials/keras/regression
+
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import pathlib
@@ -62,10 +64,9 @@ home_away_to_index = {
 
 }
 
-column_names = ['teamAbbr','teamLoc','teamRslt','opptAbbr',
-                'opptLoc']
+column_names = ['teamAbbr','teamRslt','opptAbbr']
 
-raw_dataset = pd.read_csv("../Data_Sets/2012-18_teamBoxScore.csv", names=column_names)
+raw_dataset = pd.read_csv("../Data_Sets/2012-18_teamBoxScore_new.csv", names=column_names)
 # raw_dataset = pd.read_csv("../Data_Sets/2012-18_teamBoxScore_short.csv", names=column_names)
 
 
@@ -74,15 +75,12 @@ dataset.tail()
 
 
 dataset['teamAbbr'] = dataset['teamAbbr'].map(teamToIndex)
-dataset['teamLoc'] = dataset['teamLoc'].map(home_away_to_index)
 dataset['teamRslt'] = dataset['teamRslt'].map(win_loss_to_index)
 dataset['opptAbbr'] = dataset['opptAbbr'].map(teamToIndex)
-dataset['opptLoc'] = dataset['opptLoc'].map(home_away_to_index)
-print(dataset)
 
 train_dataset = dataset.sample(frac=0.8,random_state=0)
 test_dataset = dataset.drop(train_dataset.index)
-
+print(train_dataset)
 train_stats = train_dataset.describe()
 train_stats.pop("teamRslt")
 train_stats = train_stats.transpose()
@@ -98,43 +96,43 @@ normed_test_data = norm(test_dataset)
 
 def build_model():
   model = keras.Sequential([
-    layers.Dense(64, activation='relu', input_shape=[len(train_dataset.keys())]),
-    layers.Dense(64, activation='relu'),
-    layers.Dense(1)
+    layers.Dense(128, activation='relu', input_shape=[len(train_dataset.keys())]),
+    layers.Dense(128, activation='relu'),
+    # layers.Dense(64, activation='relu', input_shape=[len(train_dataset.keys())]),
+    # layers.Dense(64, activation='relu'),
+    # layers.Dense(64, activation='relu'),
+    layers.Dense(1, activation='sigmoid')
   ])
+  model.add(keras.layers.Dropout(0.01))
+  opt = keras.optimizers.SGD(learning_rate=0.001)
+  model.compile(loss='binary_crossentropy',
+                optimizer='adam')
 
-  optimizer = tf.keras.optimizers.RMSprop(0.001)
+  # model.compile(loss='mse',
+  #               optimizer=opt,
+  #               metrics=['mae', 'mse'])
 
-  model.compile(loss='mse',
-                optimizer=optimizer,
-                metrics=['mae', 'mse'])
   return model
 
 model = build_model()
 # The patience parameter is the amount of epochs to check for improvement
-early_stop = keras.callbacks.EarlyStopping(monitor='val_loss', patience=10)
+# early_stop = keras.callbacks.EarlyStopping(monitor='val_loss', patience=100)
 
 
 model.summary()
 
-example_batch = normed_train_data[:10]
-example_result = model.predict(example_batch)
-print(example_result)
+# example_batch = normed_train_data[:10]
+# example_result = model.predict(example_batch)
+# print(example_result)
 
 
 EPOCHS = 1000
 
-history = model.fit(
+model.fit(
   normed_train_data, train_labels,
-  epochs=EPOCHS, validation_split = 0.2, verbose=0,
-  callbacks=[tfdocs.modeling.EpochDots()])
+  epochs=EPOCHS, verbose=0)
 
 
-hist = pd.DataFrame(history.history)
-hist['epoch'] = history.epoch
-print(hist.tail())
-
-loss, mae, mse = model.evaluate(normed_test_data, test_labels, verbose=2)
 
 test_predictions = model.predict(normed_test_data).flatten()
 print(test_predictions)
@@ -146,6 +144,7 @@ plt.xlabel("Prediction Error [res]")
 _ = plt.ylabel("Count")
 
 wrong = [x for x in error if x != 0]
-print(len(wrong)/len(test_labels))
+right = [x for x in error if x == 0]
+print(len(right)/len(test_labels))
 
 plt.show()
