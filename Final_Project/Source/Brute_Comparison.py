@@ -62,10 +62,9 @@ home_away_to_index = {
 
 }
 
-column_names = ['teamAbbr','teamLoc','teamRslt','opptAbbr',
-                'opptLoc']
+column_names = ['teamAbbr','teamRslt','opptAbbr']
 
-raw_dataset = pd.read_csv("../Data_Sets/2012-18_teamBoxScore.csv", names=column_names)
+raw_dataset = pd.read_csv("../Data_Sets/2012-18_teamBoxScore_new.csv", names=column_names)
 # raw_dataset = pd.read_csv("../Data_Sets/2012-18_teamBoxScore_short.csv", names=column_names)
 
 
@@ -74,10 +73,8 @@ dataset.tail()
 
 
 dataset['teamAbbr'] = dataset['teamAbbr'].map(teamToIndex)
-dataset['teamLoc'] = dataset['teamLoc'].map(home_away_to_index)
 dataset['teamRslt'] = dataset['teamRslt'].map(win_loss_to_index)
 dataset['opptAbbr'] = dataset['opptAbbr'].map(teamToIndex)
-dataset['opptLoc'] = dataset['opptLoc'].map(home_away_to_index)
 
 train_dataset = dataset.sample(frac=0.8,random_state=0)
 test_dataset = dataset.drop(train_dataset.index)
@@ -89,8 +86,15 @@ test_dataset_list = test_dataset.values.tolist()
 records_teams = [[0] * 30 for i in range(30)]
 for row in train_dataset_list:
     home_index = row[0]
-    away_index = row[3]
-    home_team_result = row[2]
+    home_team_result = row[1]
+    away_index = row[2]
+    if min(home_index, away_index) == home_index:
+        home_team_result = row[1]
+    else:
+        if row[1] == 1:
+            home_team_result = 0
+        else:
+            home_team_result = 1
     if home_team_result == 1:
         records_teams[min(home_index, away_index)][max(home_index, away_index)] += 1
     else:
@@ -99,8 +103,14 @@ for row in train_dataset_list:
 correct_count = 0
 for row in test_dataset_list:
     home_index = row[0]
-    away_index = row[3]
-    expected = row[2]
+    away_index = row[2]
+    if min(home_index, away_index) == home_index:
+        expected = row[1]
+    else:
+        if row[1] == 1:
+            expected = 0
+        else:
+            expected = 1
     if(expected == 1) and (records_teams[min(home_index, away_index)][max(home_index, away_index)] >= 0):
         correct_count += 1
     elif(expected == 0) and (records_teams[min(home_index, away_index)][max(home_index, away_index)] < 0):
@@ -111,8 +121,7 @@ print(correct_count/len(test_dataset_list))
 # Test home team vs away team
 correct_count = 0
 for row in test_dataset_list:
-    expected = row[1]
-    if expected == row[2]:
+    if row[1] == 1:
         correct_count += 1
 
 print(correct_count/len(test_dataset_list))
