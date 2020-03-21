@@ -1,5 +1,7 @@
 # This program uses a Neural Network to predict NBA games
 # Code leveraged from keras tutorial: https://www.tensorflow.org/tutorials/keras/regression
+# Written by Prathik Sannecy
+# 3/20/2020
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 

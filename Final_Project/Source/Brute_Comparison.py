@@ -1,3 +1,6 @@
+# This program uses a basic statistics to predict NBA games
+# Written by Prathik Sannecy
+# 3/20/2020
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import pathlib
@@ -82,7 +85,9 @@ train_dataset_list = train_dataset.values.tolist()
 test_dataset_list = test_dataset.values.tolist()
 
 
-# Test only teams playing against each other
+# MODEL 1:
+# Predictions based solely on priors (team that had won more against the opponent in the past will win again)
+# Training section
 records_teams = [[0] * 30 for i in range(30)]
 for row in train_dataset_list:
     home_index = row[0]
@@ -100,6 +105,7 @@ for row in train_dataset_list:
     else:
         records_teams[min(home_index, away_index)][max(home_index, away_index)] -= 1
 
+# Testing section
 correct_count = 0
 for row in test_dataset_list:
     home_index = row[0]
@@ -118,7 +124,8 @@ for row in test_dataset_list:
 print(correct_count/len(test_dataset_list))
 
 
-# Test home team vs away team
+# MODEL 2:
+# Test home team vs away team, assume Home Team will win
 correct_count = 0
 for row in test_dataset_list:
     if row[1] == 1:
